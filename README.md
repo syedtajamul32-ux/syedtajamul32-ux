@@ -27,7 +27,7 @@ I build **AI-powered tools and modern websites** for real clients, and love turn
 * 🤖 Building **AI tools** — from content humanizers to AI agents
 * ✍️ Doing **prompt engineering** and AI-assisted design work
 * 🌐 Based in **Kashmir**, working with clients across India, US & UK
-* 🎯 Long-term goal: become a strong AI/software engineer
+* 🎯 Long-term goal: build and scale my own AI/tech ventures as an entrepreneur
 * 🚀 Always building, always learning
 
 ---
