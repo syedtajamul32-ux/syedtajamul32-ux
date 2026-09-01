@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<!--
+  MATRIX RAIN INTRO — how to use in your portfolio
+  =================================================
+  1. Copy everything inside <style> into your CSS file (or a <style> tag in your <head>).
+  2. Copy the <div id="matrix-intro">...</div> block to the very top of your <body>,
+     before the rest of your page content.
+  3. Copy the <canvas> + <script> block just before your closing </body> tag.
+  4. Change the NAME_TEXT and TAGLINE_TEXT constants near the top of the script to your own.
+  5. The intro auto-removes itself after the animation finishes, revealing your real page underneath.
+     Your actual site content should just sit normally in <body> — no changes needed there.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Matrix Intro Demo</title>
+<style>
+  :root {
+    --bg: #05070a;
+    --matrix-green: #00ff9d;
+    --matrix-dim: #0a3d2e;
+    --accent-cyan: #36bcf7;
+    --text: #eafff5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Courier New', monospace;
+    overflow-x: hidden;
+  }
+
+  /* ---------- INTRO OVERLAY ---------- */
+  #matrix-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.9s ease, visibility 0.9s ease;
+  }
+
+  #matrix-intro.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  #matrix-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  #intro-text {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  #intro-text.reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #intro-name {
+    font-size: clamp(2rem, 7vw, 4.5rem);
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--matrix-green);
+    text-shadow: 0 0 18px rgba(0,255,157,0.55);
+  }
+
+  #intro-tagline {
+    margin-top: 14px;
+    font-size: clamp(0.85rem, 2vw, 1.1rem);
+    color: var(--accent-cyan);
+    letter-spacing: 3px;
+  }
+
+  #skip-btn {
+    position: absolute;
+    bottom: 32px;
+    right: 32px;
+    z-index: 3;
+    background: transparent;
+    border: 1px solid var(--matrix-dim);
+    color: var(--matrix-green);
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: border-color 0.3s, color 0.3s;
+  }
+  #skip-btn:hover { border-color: var(--matrix-green); color: #fff; }
+
+  /* ---------- DEMO PAGE BEHIND INTRO ---------- */
+  #site-content {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--text);
+    text-align: center;
+    padding: 40px;
+  }
+  #site-content h1 { font-size: 2.2rem; color: var(--accent-cyan); margin-bottom: 12px; }
+  #site-content p { color: #9fb3ac; max-width: 480px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+  <!-- INTRO OVERLAY -->
+  <div id="matrix-intro">
+    <canvas id="matrix-canvas"></canvas>
+    <div id="intro-text">
+      <div id="intro-name">TAJAMUL REYAZ</div>
+      <div id="intro-tagline">ENTREPRENEUR · AI BUILDER · DEVELOPER</div>
+    </div>
+    <button id="skip-btn">SKIP →</button>
+  </div>
+
+  <!-- YOUR ACTUAL PORTFOLIO CONTENT GOES HERE -->
+  <div id="site-content">
+    <h1>Your real portfolio content</h1>
+    <p>This is just placeholder to show what sits behind the intro. Once the matrix
+       animation finishes, it fades out and this becomes visible underneath.</p>
+  </div>
+
+  <script>
+    const NAME_TEXT = "TAJAMUL REYAZ";
+    const TAGLINE_TEXT = "ENTREPRENEUR · AI BUILDER · DEVELOPER";
+    const RAIN_DURATION_MS = 2200;   // how long pure rain plays before text appears
+    const TOTAL_DURATION_MS = 4600;  // total time before intro fades away
+
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+    const introEl = document.getElementById('matrix-intro');
+    const textEl = document.getElementById('intro-text');
+    const skipBtn = document.getElementById('skip-btn');
+
+    let width, height, columns, drops, fontSize = 16;
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      columns = Math.floor(width / fontSize);
+      drops = new Array(columns).fill(1);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const chars = "アイウエオカキクケコサシスセソ0123456789ABCDEFTAJAMUL";
+
+    function draw() {
+      ctx.fillStyle = "rgba(5,7,10,0.08)";
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = "#00ff9d";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        ctx.fillText(char, x, y);
+
+        if (y > height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    const rainInterval = setInterval(draw, 40);
+
+    // Reveal name after rain has been falling for a bit
+    setTimeout(() => {
+      textEl.classList.add('reveal');
+    }, RAIN_DURATION_MS);
+
+    // End the intro
+    function endIntro() {
+      clearInterval(rainInterval);
+      introEl.classList.add('hide');
+      setTimeout(() => introEl.remove(), 900);
+    }
+
+    setTimeout(endIntro, TOTAL_DURATION_MS);
+    skipBtn.addEventListener('click', endIntro);
+  </script>
+
+</body>
+</html>
